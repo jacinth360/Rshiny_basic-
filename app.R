@@ -1,4 +1,4 @@
-## Author: Taylor Falk
+## Author: Jacinth
 ## tfalk@bu.edu
 ## BU BF591
 ## Assignment 7
@@ -11,7 +11,25 @@ library(colourpicker) # you might need to install this
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
-
+  titlePanel("Using Shiny R to display Volcano plot and Filtered Table"),
+  sidebarLayout(
+    sidebarPanel(
+      fileInput("csv", "upload CSV file"),
+      radioButtons("x_axis", "Choose the column for x axis", 
+                   choices = c("baseMean", "log2FoldChange", "lfcSE", "stat", "pvalue", "padj")
+      ),
+      radioButtons("y_axis", "Choose the column for y axis", 
+                   choices = c("baseMean", "log2FoldChange", "lfcSE", "stat", "pvalue", "padj")
+      ),
+      sliderInput("threshold", "Select the magnitude of the p value", min = -300, max = 0, value = -180, step = 20),
+      colourInput("color1", "Base point color:", value = "#DB349E"),
+      colourInput("color2", "Highlight point color", value = "#3CDAE8")
+    ),
+    mainPanel(
+      plotOutput("volcano"),
+      tableOutput("table")
+    )
+  )
 )
 
 # Define server logic required to draw a histogram
@@ -26,9 +44,11 @@ server <- function(input, output, session) {
     #' our case, look for the uploaded file's datapath argument and load it with 
     #' read.csv. Return this data frame in the normal return() style.
     load_data <- reactive({
-
-      
-        return()
+      req(input$csv)
+      df <- read.csv(input$csv$datapath)
+      updateRadioButtons(session, "x_axis", choices = colnames(df), selected = colnames(df)[1])
+      updateRadioButtons(session, "y_axis", choices = colnames(df), selected = colnames(df)[2])
+      return(df)
     })
     
     #' Volcano plot
@@ -51,11 +71,16 @@ server <- function(input, output, session) {
     #' !!sym() may be required to access column names in ggplot aes().
     #'
     #' @examples volcano_plot(df, "log2fc", "padj", -100, "blue", "taupe")
-    volcano_plot <-
-        function(dataf, x_name, y_name, slider, color1, color2) {
-
-
-            return()
+    volcano_plot <-function(dataf, x_name, y_name, slider, color1, color2) {
+      ggplot(dataf, aes_string(x = x_name, y = y_name)) +
+            geom_point(aes(color = padj < 10**slider), size = 3) +
+            scale_color_manual(values = c(color1, color2)) +
+            theme_minimal() +
+            labs(
+              x = x_name,
+              y = y_name,
+              title = "Volcano Plot"
+            )
         }
     
     #' Draw and filter table
@@ -78,18 +103,23 @@ server <- function(input, output, session) {
     #'gene1 11690.780   9.852926 0.2644650  37.25607 8.45125e-304 1.54472e-299
     #'gene2  3550.435  -6.183714 0.1792708 -34.49369 9.97262e-261 9.11398e-257
     draw_table <- function(dataf, slider) {
-
-        return()
+      filtered_df <- dataf %>% filter(padj < 10**slider)
+      formatted_data <- filtered_df %>%
+        mutate(pvalue = formatC(pvalue, format = "e", digits = 6)) %>%
+        mutate(padj = formatC(padj, format = "e", digits = 6))
+        return(formatted_data)
     }
     
     #' These outputs aren't really functions, so they don't get a full skeleton, 
     #' but use the renderPlot() and renderTabel() functions to return() a plot 
     #' or table object, and those will be displayed in your application.
-    output$volcano <- NULL # replace this NULL
-
-    
+    output$volcano <- renderPlot({
+      volcano_plot(load_data(), input$x_axis, input$y_axis, input$threshold, input$color1, input$color2)
+    })
     # Same here, just return the table as you want to see it in the web page
-    output$table <- NULL # replace this NULL
+    output$table <- renderTable({
+      draw_table(load_data(), input$threshold)
+    })
 }
 
 # Run the application
