@@ -1,7 +1,4 @@
 ## Author: Jacinth
-## tfalk@bu.edu
-## BU BF591
-## Assignment 7
 
 # Welcome to R Shiny. All that glitters is not gold.
 library(shiny)
