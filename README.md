@@ -31,4 +31,4 @@ To run the application:
 Feedback and contributions are welcome! If you have any suggestions for improving the application or want to contribute new features, feel free to open an issue or submit a pull request.
 
 ## Contact
-For inquiries or support, please contact (mailto:jacinth@bu.edu).
+For inquiries or support, please contact jacinth@bu.edu
