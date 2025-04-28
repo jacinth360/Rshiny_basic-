@@ -3,10 +3,7 @@
 > Building interactive data visualization tools for effective communication.
 
 ## Introduction
-In the realm of data science, effectively communicating findings and insights is paramount. Especially in fields like bioinformatics, where collaborators might not be as tech-savvy, creating user-friendly visualization tools becomes essential. This project aims to develop an R Shiny application to facilitate the exploration and visualization of data, catering to both technical and non-technical users.
-
-## Problem Statement
-Communicating complex data and results to stakeholders who may not have a technical background can be challenging. This project addresses this challenge by developing an interactive data visualization application using R Shiny. By providing an intuitive interface, users can explore data and gain insights without requiring advanced technical skills.
+This repo aims to develop an R Shiny application to facilitate the exploration and visualization of data. 
 
 ## Objectives
 - Develop a user-friendly interface using R Shiny.
